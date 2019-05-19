@@ -3,17 +3,13 @@
 //  
 // Block-compression (BC) functionality for BC4 and BC5 (DirectX 10 texture compression)
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//  
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=248926
 //-------------------------------------------------------------------------------------
 
-#include "directxtexp.h"
+#include "DirectXTexp.h"
 
 #include "BC.h"
 
@@ -74,13 +70,13 @@ namespace
 
         size_t GetIndex(size_t uOffset) const
         {
-            return (size_t)((data >> (3 * uOffset + 16)) & 0x07);
+            return static_cast<size_t>((data >> (3 * uOffset + 16)) & 0x07);
         }
 
         void SetIndex(size_t uOffset, size_t uIndex)
         {
-            data &= ~((uint64_t)0x07 << (3 * uOffset + 16));
-            data |= ((uint64_t)uIndex << (3 * uOffset + 16));
+            data &= ~(uint64_t(0x07) << (3 * uOffset + 16));
+            data |= (uint64_t(uIndex) << (3 * uOffset + 16));
         }
 
         union
@@ -133,13 +129,13 @@ namespace
 
         size_t GetIndex(size_t uOffset) const
         {
-            return (size_t)((data >> (3 * uOffset + 16)) & 0x07);
+            return static_cast<size_t>((data >> (3 * uOffset + 16)) & 0x07);
         }
 
         void SetIndex(size_t uOffset, size_t uIndex)
         {
-            data &= ~((uint64_t)0x07 << (3 * uOffset + 16));
-            data |= ((uint64_t)uIndex << (3 * uOffset + 16));
+            data &= ~(uint64_t(0x07) << (3 * uOffset + 16));
+            data |= (uint64_t(uIndex) << (3 * uOffset + 16));
         }
 
         union
@@ -172,14 +168,14 @@ namespace
                 if (fVal < -1)
                     fVal = -1;    // Clamp to -1
 
-        fVal = fVal * (int8_t)(dwMostNeg - 1);
+        fVal = fVal * static_cast<int8_t>(dwMostNeg - 1);
 
         if (fVal >= 0)
             fVal += .5f;
         else
             fVal -= .5f;
 
-        *piSNorm = (int8_t)(fVal);
+        *piSNorm = static_cast<int8_t>(fVal);
     }
 
 
@@ -220,8 +216,8 @@ namespace
             // 6 interpolated color values
             OptimizeAlpha<false>(&fStart, &fEnd, theTexelsU, 8);
 
-            uint8_t iStart = static_cast<uint8_t>(fStart * 255.0f);
-            uint8_t iEnd = static_cast<uint8_t>(fEnd * 255.0f);
+            auto iStart = static_cast<uint8_t>(fStart * 255.0f);
+            auto iEnd = static_cast<uint8_t>(fEnd * 255.0f);
 
             endpointU_0 = iEnd;
             endpointU_1 = iStart;
@@ -231,8 +227,8 @@ namespace
             // 4 interpolated color values
             OptimizeAlpha<false>(&fStart, &fEnd, theTexelsU, 6);
 
-            uint8_t iStart = static_cast<uint8_t>(fStart * 255.0f);
-            uint8_t iEnd = static_cast<uint8_t>(fEnd * 255.0f);
+            auto iStart = static_cast<uint8_t>(fStart * 255.0f);
+            auto iEnd = static_cast<uint8_t>(fEnd * 255.0f);
 
             endpointU_1 = iEnd;
             endpointU_0 = iStart;

@@ -4,9 +4,10 @@
 // The Compute Shader for BC6H Encoder
 //
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //--------------------------------------------------------------------------------------
 
-//#define REF_DEVICE
+#define REF_DEVICE
 
 #define UINTLENGTH            32
 #define NCHANNELS             3

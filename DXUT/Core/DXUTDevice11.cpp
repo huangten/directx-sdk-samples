@@ -3,12 +3,8 @@
 //
 // Enumerates D3D adapters, devices, modes, etc.
 //
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 //
 // http://go.microsoft.com/fwlink/?LinkId=320437
 //--------------------------------------------------------------------------------------
@@ -42,7 +38,7 @@ void WINAPI DXUTDestroyD3D11Enumeration()
 class DXUTMemoryHelperD3D11Enum
 {
 public:
-DXUTMemoryHelperD3D11Enum() { DXUTCreateD3D11Enumeration(); }
+DXUTMemoryHelperD3D11Enum() noexcept { DXUTCreateD3D11Enumeration(); }
 ~DXUTMemoryHelperD3D11Enum() { DXUTDestroyD3D11Enumeration(); }
 };
 
@@ -69,7 +65,7 @@ CD3D11Enumeration* WINAPI DXUTGetD3D11Enumeration( bool bForceEnumerate, bool bE
 
 
 //--------------------------------------------------------------------------------------
-CD3D11Enumeration::CD3D11Enumeration() :
+CD3D11Enumeration::CD3D11Enumeration() noexcept :
     m_bHasEnumerated(false),
     m_IsD3D11DeviceAcceptableFunc(nullptr),
     m_pIsD3D11DeviceAcceptableFuncUserContext(nullptr),
@@ -236,7 +232,7 @@ HRESULT CD3D11Enumeration::Enumerate( LPDXUTCALLBACKISD3D11DEVICEACCEPTABLE IsD3
     {
         static const D3D_FEATURE_LEVEL fLvlWarp[] =
         {
-#ifdef USE_DIRECT3D11_3
+#if defined(USE_DIRECT3D11_3) || defined(USE_DIRECT3D11_4) 
             D3D_FEATURE_LEVEL_12_1, D3D_FEATURE_LEVEL_12_0,
 #endif
             D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1
@@ -247,7 +243,7 @@ HRESULT CD3D11Enumeration::Enumerate( LPDXUTCALLBACKISD3D11DEVICEACCEPTABLE IsD3
                                              D3D11_SDK_VERSION, &pDevice, &m_warpFL, nullptr );
         if ( hr == E_INVALIDARG )
         {
-#ifdef USE_DIRECT3D11_3
+#if defined(USE_DIRECT3D11_3) || defined(USE_DIRECT3D11_4) 
             // DirectX 11.1 runtime will not recognize FL 12.x, so try without it
             hr = DXUT_Dynamic_D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP, 0, 0, &fLvlWarp[2], _countof(fLvlWarp) - 2,
                                                 D3D11_SDK_VERSION, &pDevice, &m_warpFL, nullptr);
@@ -496,7 +492,7 @@ HRESULT CD3D11Enumeration::EnumerateDevices( _In_ CD3D11EnumAdapterInfo* pAdapte
 
         static const D3D_FEATURE_LEVEL FeatureLevels[] =
         {
-#ifdef USE_DIRECT3D11_3
+#if defined(USE_DIRECT3D11_3) || defined(USE_DIRECT3D11_4) 
             D3D_FEATURE_LEVEL_12_1,
             D3D_FEATURE_LEVEL_12_0,
 #endif
@@ -526,7 +522,7 @@ HRESULT CD3D11Enumeration::EnumerateDevices( _In_ CD3D11EnumAdapterInfo* pAdapte
 
         if ( hr == E_INVALIDARG )
         {
-#ifdef USE_DIRECT3D11_3
+#if defined(USE_DIRECT3D11_3) || defined(USE_DIRECT3D11_4) 
             // DirectX 11.1 runtime will not recognize FL 12.x, so try without it
             hr = DXUT_Dynamic_D3D11CreateDevice((devTypeArray[iDeviceType] == D3D_DRIVER_TYPE_HARDWARE) ? pAdapterInfo->m_pAdapter : nullptr,
                                                 (devTypeArray[iDeviceType] == D3D_DRIVER_TYPE_HARDWARE) ? D3D_DRIVER_TYPE_UNKNOWN : devTypeArray[iDeviceType],
@@ -1119,8 +1115,8 @@ float DXUTRankD3D11DeviceCombo( CD3D11EnumDeviceSettingsCombo* pDeviceSettingsCo
             {
                 auto displayMode = pDeviceSettingsCombo->pOutputInfo->displayModeList[ idm ];
 
-                float refreshDiff = fabs( ( float( displayMode.RefreshRate.Numerator ) / float( displayMode.RefreshRate.Denominator ) ) -
-                                          ( float( pOptimalDeviceSettings->sd.BufferDesc.RefreshRate.Numerator ) / float( pOptimalDeviceSettings->sd.BufferDesc.RefreshRate.Denominator ) ) );
+                float refreshDiff = fabsf( ( float( displayMode.RefreshRate.Numerator ) / float( displayMode.RefreshRate.Denominator ) ) -
+                                           ( float( pOptimalDeviceSettings->sd.BufferDesc.RefreshRate.Numerator ) / float( pOptimalDeviceSettings->sd.BufferDesc.RefreshRate.Denominator ) ) );
 
                 if( displayMode.Width == pOptimalDeviceSettings->sd.BufferDesc.Width
                     && displayMode.Height == pOptimalDeviceSettings->sd.BufferDesc.Height
@@ -1132,8 +1128,8 @@ float DXUTRankD3D11DeviceCombo( CD3D11EnumDeviceSettingsCombo* pDeviceSettingsCo
                 }
 
                 float current = refreshDiff
-                                + fabs( float( displayMode.Width ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Width ) ) 
-                                + fabs( float( displayMode.Height ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Height ) );
+                                + fabsf( float( displayMode.Width ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Width ) ) 
+                                + fabsf( float( displayMode.Height ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Height ) );
 
                 if( current < best )
                 {
@@ -1157,8 +1153,8 @@ float DXUTRankD3D11DeviceCombo( CD3D11EnumDeviceSettingsCombo* pDeviceSettingsCo
                     break;
                 }
 
-                float current = fabs( float( displayMode.Width ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Width ) ) 
-                                + fabs( float( displayMode.Height ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Height ) );
+                float current = fabsf( float( displayMode.Width ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Width ) ) 
+                                + fabsf( float( displayMode.Height ) - float ( pOptimalDeviceSettings->sd.BufferDesc.Height ) );
 
                 if( current < best )
                 {
